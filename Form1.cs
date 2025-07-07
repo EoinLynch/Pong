@@ -6,6 +6,11 @@ namespace PongGame
 {
     public partial class Form1 : Form
     {
+        // UI state
+        private enum GameState { Menu, Playing }
+        private GameState currentState = GameState.Menu;
+        private Button? btnStartPong;
+
         // Game objects
         private Rectangle playerPaddle;
         private Rectangle pitchRect;
@@ -21,7 +26,7 @@ namespace PongGame
         private int paddleSpeed = 6;
         private int ballSpeedX = 5;
         private int ballSpeedY = 5;
-        private System.Windows.Forms.Timer gameTimer;
+        private System.Windows.Forms.Timer? gameTimer;
         private bool upPressed = false;
         private bool downPressed = false;
 
@@ -32,14 +37,34 @@ namespace PongGame
             this.Width = 800;
             this.Height = 450;
             this.Text = "Pong Game";
+            ShowMenu();
+        }
+
+        private void ShowMenu()
+        {
+            currentState = GameState.Menu;
+            this.Controls.Clear();
+            btnStartPong = new Button();
+            btnStartPong.Text = "Play Pong";
+            btnStartPong.Font = new Font("Arial", 24);
+            btnStartPong.Size = new Size(250, 80);
+            btnStartPong.Location = new Point((this.ClientSize.Width - btnStartPong.Width) / 2, (this.ClientSize.Height - btnStartPong.Height) / 2);
+            btnStartPong.Click += BtnStartPong_Click;
+            this.Controls.Add(btnStartPong);
+            this.Paint -= Form1_Paint;
+            this.KeyDown -= Form1_KeyDown;
+            this.KeyUp -= Form1_KeyUp;
+        }
+
+        private void BtnStartPong_Click(object? sender, EventArgs e)
+        {
+            this.Controls.Clear();
             StartGame();
-            this.KeyDown += Form1_KeyDown;
-            this.KeyUp += Form1_KeyUp;
-            this.Paint += Form1_Paint;
         }
 
         private void StartGame()
         {
+            currentState = GameState.Playing;
             pitchRect = new Rectangle(0, 0, this.ClientSize.Width, this.ClientSize.Height);
 
             playerPaddle = new Rectangle(30, (this.ClientSize.Height - paddleHeight) / 2, paddleWidth, paddleHeight);
@@ -51,10 +76,14 @@ namespace PongGame
             gameTimer.Interval = 16; // ~60 FPS
             gameTimer.Tick += GameTimer_Tick;
             gameTimer.Start();
+            this.KeyDown += Form1_KeyDown;
+            this.KeyUp += Form1_KeyUp;
+            this.Paint += Form1_Paint;
         }
 
-        private void GameTimer_Tick(object sender, EventArgs e)
+        private void GameTimer_Tick(object? sender, EventArgs e)
         {
+            if (currentState != GameState.Playing) return;
             // Player movement
             if (upPressed && playerPaddle.Top > 0)
                 playerPaddle.Y -= paddleSpeed;
@@ -103,8 +132,9 @@ namespace PongGame
             ballSpeedX = -ballSpeedX;
         }
 
-        private void Form1_Paint(object sender, PaintEventArgs e)
+        private void Form1_Paint(object? sender, PaintEventArgs e)
         {
+            if (currentState != GameState.Playing) return;
             Graphics g = e.Graphics;
             // Draw paddles and ball
             g.FillRectangle(Brushes.Black, pitchRect);  
@@ -119,14 +149,16 @@ namespace PongGame
             }
         }
 
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        private void Form1_KeyDown(object? sender, KeyEventArgs e)
         {
+            if (currentState != GameState.Playing) return;
             if (e.KeyCode == Keys.W) upPressed = true;
             if (e.KeyCode == Keys.S) downPressed = true;
         }
 
-        private void Form1_KeyUp(object sender, KeyEventArgs e)
+        private void Form1_KeyUp(object? sender, KeyEventArgs e)
         {
+            if (currentState != GameState.Playing) return;
             if (e.KeyCode == Keys.W) upPressed = false;
             if (e.KeyCode == Keys.S) downPressed = false;
         }

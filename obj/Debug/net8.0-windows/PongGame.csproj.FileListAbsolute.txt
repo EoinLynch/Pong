@@ -12,3 +12,4 @@ C:\Users\el\Documents\Pong\obj\Debug\net8.0-windows\refint\PongGame.dll
 C:\Users\el\Documents\Pong\obj\Debug\net8.0-windows\PongGame.pdb
 C:\Users\el\Documents\Pong\obj\Debug\net8.0-windows\PongGame.genruntimeconfig.cache
 C:\Users\el\Documents\Pong\obj\Debug\net8.0-windows\ref\PongGame.dll
+C:\Users\el\Documents\Pong\obj\Debug\net8.0-windows\PongGame.sourcelink.json
